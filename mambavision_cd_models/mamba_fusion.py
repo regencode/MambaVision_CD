@@ -273,8 +273,6 @@ class MambaVisionCDDecoder(nn.Module):
         x_1_fuse = self.final_block(self.fusion[0](x11, x21), x_last=x_2_fuse)
         return self.classifier(x_1_fuse)
 
-@register_pip_model
-@register_model
 class MambaVisionCD(nn.Module):
     def __init__(self,
                  in_chans,
@@ -283,6 +281,7 @@ class MambaVisionCD(nn.Module):
                  window_size,
                  mlp_ratio,
                  num_heads,
+                 encoder_model=None,
                  drop_path_rate=0.2,
                  num_classes=2,
                  qkv_bias=True,
@@ -293,25 +292,27 @@ class MambaVisionCD(nn.Module):
                  layer_scale_conv=None,
                  **kwargs):
         super().__init__()
-        self.enc = create_model("")
-        self.enc = MambaVision(
-                 in_chans,
-                 dims,
-                 depths,
-                 window_size,
-                 mlp_ratio,
-                 num_heads,
-                 drop_path_rate=drop_path_rate,
-                 num_classes=num_classes,
-                 qkv_bias=qkv_bias,
-                 qk_scale=qk_scale,
-                 drop_rate=drop_rate,
-                 attn_drop_rate=attn_drop_rate,
-                 layer_scale=layer_scale,
-                 layer_scale_conv=layer_scale_conv
-        )
+        if encoder_model is not None:
+            self.enc = create_model(encoder_model, pretrained=True)
+        else:
+            self.enc = MambaVision(
+                     in_chans,
+                     dims,
+                     depths,
+                     window_size,
+                     mlp_ratio,
+                     num_heads,
+                     drop_path_rate=drop_path_rate,
+                     num_classes=num_classes,
+                     qkv_bias=qkv_bias,
+                     qk_scale=qk_scale,
+                     drop_rate=drop_rate,
+                     attn_drop_rate=attn_drop_rate,
+                     layer_scale=layer_scale,
+                     layer_scale_conv=layer_scale_conv
+            )
         self.dec = MambaVisionCDDecoder(num_classes,
-                                        dims=dims)
+                                        dims=self.enc.dims)
 
     def forward(self, x1, x2):
         x1s = self.enc(x1)

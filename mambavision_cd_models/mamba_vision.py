@@ -648,6 +648,8 @@ class MambaVision(nn.Module):
                  layer_scale=None,
                  layer_scale_conv=None,
                  **kwargs):
+        self.dims = dims
+        self.depths = depths
         """
         Args:
             in_chans: number of channels in input.
@@ -740,7 +742,7 @@ class MambaVision(nn.Module):
 @register_model
 def mamba_vision_T(pretrained=False, **kwargs):
     model_path = kwargs.pop("model_path", "/tmp/mamba_vision_T.pth.tar")
-    dims = kwargs.pop("dims", [80, 160, 320, 480])
+    dims = kwargs.pop("dims", [80, 160, 320, 640])
     depths = kwargs.pop("depths", [1, 3, 8, 4])
     num_heads = kwargs.pop("num_heads", [2, 4, 8, 16])
     window_size = kwargs.pop("window_size", [8, 8, 14, 7])
