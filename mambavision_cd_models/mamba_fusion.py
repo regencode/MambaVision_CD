@@ -251,9 +251,9 @@ class MambaVisionCDDecoder(nn.Module):
         ])
         self.lowest_block = MambaVisionCDDecoderBlock(dims[-1], dims[-2], upsample=True, fuse_features=False)
         self.blocks = nn.ModuleList([
-            MambaVisionCDDecoderBlock(dims[i], dims[i-1]) for i in range(2, len(dims)-1)
+            MambaVisionCDDecoderBlock(dims[i], dims[i-1], upsample=True, fuse_features=True) for i in range(2, len(dims)-1)
         ])
-        self.final_block = MambaVisionCDDecoderBlock(dims[1], dims[0], upsample=False, fuse_features=False)
+        self.final_block = MambaVisionCDDecoderBlock(dims[1], dims[0], upsample=False, fuse_features=True)
         self.classifier = ConvUpsampleAndClassify(dims[0], num_classes)
 
 
@@ -262,7 +262,7 @@ class MambaVisionCDDecoder(nn.Module):
         x_fused_list[-1] = self.lowest_block(self.fusion[-1](x1s[-1], x2s[-1]))
         for i in range(len(self.blocks)-2,0,-1):
             x_fused_list[i] = self.blocks[i](self.fusion[i](x1s[i], x2s[i]), x_last=x_fused_list[i+1])
-        return self.classifier(self.final_block(x_fused_list[1]))
+        return self.classifier(self.final_block(self.fusion[0](x1s[0], x2s[0]), x_last=x_fused_list[1]))
 
 class MambaVisionCD(nn.Module):
     def __init__(self,
