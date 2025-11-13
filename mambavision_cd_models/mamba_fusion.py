@@ -69,7 +69,7 @@ class GlobalExtractor(nn.Module):
         self.x_proj = nn.Linear(
             self.d_inner, self.dt_rank + self.d_state * 2, bias=False
         )
-        self.global_path_ln = nn.LayerNorm(self.d_inner),
+        self.global_path_ln = nn.LayerNorm(self.d_inner)
         self.D = nn.Parameter(torch.ones(self.d_inner, device=device))
         self.out_proj = nn.Linear(self.d_inner, out_channels)
         self.to_sequence = ToSequenceForm()
