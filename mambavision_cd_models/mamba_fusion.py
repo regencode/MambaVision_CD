@@ -69,6 +69,7 @@ class GlobalExtractor(nn.Module):
         self.x_proj = nn.Linear(
             self.d_inner, self.dt_rank + self.d_state * 2, bias=False
         )
+        self.global_path_ln = nn.LayerNorm(self.d_inner),
         self.D = nn.Parameter(torch.ones(self.d_inner, device=device))
         self.out_proj = nn.Linear(self.d_inner, out_channels)
         self.to_sequence = ToSequenceForm()
@@ -99,9 +100,10 @@ class GlobalExtractor(nn.Module):
             self.dt_proj.bias.copy_(inv_dt)
    
     def global_path(self, x):
-        _, seqlen, _ = x.shape
+        _, seqlen, D = x.shape
         x = self.global_proj(x)
         x =  self.global_conv(rearrange(x, "b l d -> b d l"))
+        x = self.global_proj_ln(x)
 
         x_dbl = self.x_proj(rearrange(x, "b d l -> (b l) d"))
         dt, B, C = torch.split(x_dbl, [self.dt_rank, self.d_state, self.d_state], dim=-1)
@@ -229,6 +231,7 @@ class ConvUpsampleAndClassify(nn.Module):
         self.conv1 = nn.ConvTranspose2d(in_channels=in_channels, out_channels=in_channels, kernel_size=4, stride=2, padding=1)
         self.dense = nn.Sequential(
                 nn.Conv2d(in_channels, embed_dims, kernel_size=3, padding=1),
+                nn.BatchNorm2d(in_channels),
                 nn.ReLU(),
                 nn.Conv2d(embed_dims, in_channels, kernel_size=3, padding=1)
         )
