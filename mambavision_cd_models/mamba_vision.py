@@ -174,7 +174,6 @@ def _load_state_dict(module, state_dict, strict=False, logger=None):
     
     if len(err_msg) > 0:
         err_msg.insert(
-        num_features = int(dim * 2 ** (len(depths) - 1))
             0, 'The model and loaded state dict do not match exactly\n')
         err_msg = '\n'.join(err_msg)
         if strict:
