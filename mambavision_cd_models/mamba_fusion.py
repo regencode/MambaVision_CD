@@ -65,7 +65,7 @@ class GlobalExtractor(nn.Module):
             nn.SiLU()
         )
         self.x_proj = nn.Linear(
-            self.d_inner//2, self.dt_rank + self.d_state * 2, bias=False
+            self.d_inner, self.dt_rank + self.d_state * 2, bias=False
         )
         self.D = nn.Parameter(torch.ones(self.d_inner//2, device=device))
         self.out_proj = nn.Linear(self.d_inner, out_channels)
