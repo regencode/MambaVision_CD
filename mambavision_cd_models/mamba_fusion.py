@@ -265,6 +265,19 @@ class MambaVisionCDDecoder(nn.Module):
         self.final_block = MambaVisionCDDecoderBlock(dims[0], dims[0], upsample=False, fuse_features=True)
         self.classifier = ConvUpsampleAndClassify(dims[0], num_classes)
 
+        self.apply(self._init_weights)
+
+    def _init_weights(self, m):
+        if isinstance(m, nn.Linear):
+            nn.init.trunc_normal_(m.weight, std=.02)
+            if isinstance(m, nn.Linear) and m.bias is not None:
+                nn.init.constant_(m.bias, 0)
+        elif isinstance(m, nn.LayerNorm):
+            nn.init.constant_(m.bias, 0)
+            nn.init.constant_(m.weight, 1.0)
+        elif isinstance(m, nn.BatchNorm2d):
+            nn.init.ones_(m.weight)
+            nn.init.zeros_(m.bias)
 
     def forward(self, x1s, x2s):
         x11, x12, x13, x14 = x1s
