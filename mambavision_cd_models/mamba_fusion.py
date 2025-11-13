@@ -204,9 +204,13 @@ class MambaVisionCDDecoderBlock(nn.Module):
                 nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1),
                 nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, padding=1)
         )
+        self.to_seq = ToSequenceForm()
+        self.to_img = ToImageForm()
 
     def forward(self, x, x_last=None):
+        x = self.to_seq(x)
         x = self.mixer(x) + x_last if self.fuse_features or x_last == None else self.mixer(x)
+        x = self.to_img(x)
         if not self.upsample:
             return x
         return self.forward_features(x)
