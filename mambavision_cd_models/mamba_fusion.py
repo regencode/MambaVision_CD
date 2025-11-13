@@ -307,5 +307,6 @@ class MambaVisionCD(nn.Module):
     def forward(self, x1, x2):
         x1s = self.enc(x1)
         x2s = self.enc(x2)
+        print(x1s[3].shape)
         return self.dec(x1s, x2s)
 
