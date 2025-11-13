@@ -118,6 +118,7 @@ class GlobalExtractor(nn.Module):
                               delta_softplus=True, 
                               return_last_state=None)
         y = rearrange(y, "b d l -> b l d")
+        return y
 
     def forward(self, f1, f2):
         f1 = self.to_sequence(f1)
