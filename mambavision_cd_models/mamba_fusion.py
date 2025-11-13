@@ -202,7 +202,8 @@ class MambaVisionCDDecoderBlock(nn.Module):
         self.mixer = MambaVisionMixer(in_channels)
         self.forward_features = nn.Sequential(
                 nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1),
-                nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, padding=1)
+                nn.ReLU(),
+                nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1)
         )
         self.to_seq = ToSequenceForm()
         self.to_img = ToImageForm()
