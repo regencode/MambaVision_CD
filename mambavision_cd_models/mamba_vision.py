@@ -666,9 +666,11 @@ class MambaVision(nn.Module):
             layer_scale_conv: conv layer scaling coefficient.
         """
         super().__init__()
+        assert len(dims) == len(depths), f"dims[] len does not match depths[] len"
         self.patch_embed = PatchEmbed(in_chans=in_chans, out_chans=dims[0], in_dim=256)
         dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))]
         self.levels = nn.ModuleList()
+        self.downsamples = nn.ModuleList()
         for i in range(len(depths)):
             conv = True if (i == 0 or i == 1) else False
             level = MambaVisionLayer(dim=dims[i],
@@ -682,12 +684,14 @@ class MambaVision(nn.Module):
                                      drop=drop_rate,
                                      attn_drop=attn_drop_rate,
                                      drop_path=dpr[sum(depths[:i]):sum(depths[:i + 1])],
-                                     downsample=(i < 3),
+                                     downsample=False,
                                      layer_scale=layer_scale,
                                      layer_scale_conv=layer_scale_conv,
                                      transformer_blocks=list(range(depths[i]//2+1, depths[i])) if depths[i]%2!=0 else list(range(depths[i]//2, depths[i])),
                                      )
             self.levels.append(level)
+            downsample = Downsample(dim=dims[i])
+            self.downsamples.append(downsample)
         self.apply(self._init_weights)
         num_features = int(dims[-1])
         self.norm = nn.BatchNorm2d(num_features)
@@ -714,9 +718,10 @@ class MambaVision(nn.Module):
     def forward_features(self, x):
         x = self.patch_embed(x)
         x_levels = []
-        for level in self.levels:
+        for i, level in enumerate(self.levels):
             x = level(x)
             x_levels.append(x)
+            if (i < 3): x = self.downsamples[i](x)
         return x_levels
 
     def forward(self, x):
