@@ -332,7 +332,7 @@ class MambaVisionMixer(nn.Module):
         dt_init_floor=1e-4,
         conv_bias=True,
         bias=False,
-        use_linear=True
+        use_linear=True,
         use_fast_path=True, 
         layer_idx=None,
         device=None,
