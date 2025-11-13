@@ -171,8 +171,8 @@ class LocalGlobalFusion(nn.Module):
     def compute_gate_score(self, f_g, f_l): # each of shape B L D
         f_g = self.to_seq(f_g)
         f_l = self.to_seq(f_l)
-        f_g_mean = torch.mean(f_g, dim=1, keepdim=True) # B D
-        f_l_mean = torch.mean(f_l, dim=1, keepdim=True) # B D
+        f_g_mean = torch.mean(f_g, dim=1) # B D
+        f_l_mean = torch.mean(f_l, dim=1) # B D
         f_gl_mean = torch.cat([f_g_mean, f_l_mean], dim=-1) # B 2D
         gate_score = F.softmax(self.sum_weight_proj(f_gl_mean), dim=-1) # B 2
         # gate score weights importance of each dimension
