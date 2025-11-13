@@ -251,7 +251,7 @@ class MambaVisionCDDecoder(nn.Module):
         ])
         self.lowest_block = MambaVisionCDDecoderBlock(dims[-1], dims[-2], upsample=True, fuse_features=False)
         self.blocks = nn.ModuleList([
-            MambaVisionCDDecoderBlock(dims[i], dims[i-1]) for i in range(1, len(dims)-1)
+            MambaVisionCDDecoderBlock(dims[i], dims[i-1]) for i in range(2, len(dims)-1)
         ])
         self.final_block = MambaVisionCDDecoderBlock(dims[1], dims[0], upsample=False, fuse_features=False)
         self.classifier = ConvUpsampleAndClassify(dims[0], num_classes)
