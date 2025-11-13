@@ -270,7 +270,7 @@ class MambaVisionCDDecoder(nn.Module):
 class MambaVisionCD(nn.Module):
     def __init__(self,
                  in_chans,
-                 dim,
+                 dims,
                  depths,
                  window_size,
                  mlp_ratio,
