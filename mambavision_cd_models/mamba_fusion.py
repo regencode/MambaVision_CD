@@ -140,6 +140,7 @@ class LocalExtractor(nn.Module):
         self.d_inner = int(in_channels*expand)
         self.mamba_mixer_path = MambaVisionMixer(in_channels, expand=expand, use_linear=False)
         self.local_ext_path = nn.Sequential(
+            ToImageForm(),
             nn.Conv2d(in_channels, self.d_inner, kernel_size=3, padding=1),
             nn.SiLU(),
             nn.Conv2d(self.d_inner, self.d_inner, kernel_size=3, padding=1),
