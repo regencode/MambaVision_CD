@@ -93,24 +93,18 @@ class GlobalExtractor(nn.Module):
         with torch.no_grad():
             self.dt_proj.bias.copy_(inv_dt)
    
+    def global_path(self, x):
+        _, seqlen, _ = x.shape
+        x = self.global_proj(x)
+        x =  self.global_conv(rearrange(x, "b l d -> b d l"))
 
-    def forward(self, f1, f2):
-        f1 = self.to_sequence(f1)
-        f2 = self.to_sequence(f2)
-        _, seqlen, _ = f1.shape
-
-        f1 = self.mamba_mixer_path(f1)
-
-        f2_proj = self.global_proj(f2)
-        f2 =  self.global_conv(rearrange(f2_proj, "b l d -> b d l"))
-
-        x_dbl = self.x_proj(rearrange(f2, "b d l -> (b l) d"))
+        x_dbl = self.x_proj(rearrange(x, "b d l -> (b l) d"))
         dt, B, C = torch.split(x_dbl, [self.dt_rank, self.d_state, self.d_state], dim=-1)
         dt = rearrange(self.dt_proj(dt), "(b l) d -> b d l", l=seqlen)
         A = -torch.exp(self.A_log.float())
         B = rearrange(B, "(b l) dstate -> b dstate l", l=seqlen).contiguous()
         C = rearrange(C, "(b l) dstate -> b dstate l", l=seqlen).contiguous()
-        y = selective_scan_fn(f2, 
+        y = selective_scan_fn(x, 
                               dt, 
                               A, 
                               B, 
@@ -121,7 +115,18 @@ class GlobalExtractor(nn.Module):
                               delta_softplus=True, 
                               return_last_state=None)
         y = rearrange(y, "b d l -> b l d")
-        return self.to_img(self.out_proj(f1 * y))
+
+    def forward(self, f1, f2):
+        f1 = self.to_sequence(f1)
+        f2 = self.to_sequence(f2)
+
+        x11 = self.mamba_mixer_path(f1)
+        x12 = self.global_path(f2)
+
+        x21 = self.mamba_mixer_path(f2)
+        x22 = self.global_path(f1)
+
+        return self.to_img(self.out_proj(x11 * x12)), self.to_img(self.out_proj(x21 * x22))
             
     
 
@@ -138,18 +143,22 @@ class LocalExtractor(nn.Module):
             nn.SiLU()
         ) 
         self.out_proj = nn.Linear(self.d_inner, out_channels)
+        self.to_img = ToImageForm()
 
     def forward(self, f1, f2):
-        f1 = self.mamba_mixer_path(f1)
-        f2 = self.local_ext_path(f2)
-        return self.out_proj(f1 * f2)
+        x11 = self.mamba_mixer_path(f1)
+        x12 = self.local_ext_path(f2)
+
+        x21 = self.mamba_mixer_path(f2)
+        x22 = self.local_ext_path(f1)
+        return self.to_img(self.out_proj(x11 * x12)), self.to_img(self.out_proj(x21 * x22))
         
 
 class LocalGlobalFusion(nn.Module):
     def __init__(self, in_channels):
         super().__init__()
-        self.local_extractor = GlobalExtractor(in_channels, in_channels)
-        self.global_extractor = LocalExtractor(in_channels, in_channels)
+        self.global_extractor = GlobalExtractor(in_channels, in_channels)
+        self.local_extractor = LocalExtractor(in_channels, in_channels)
         self.sum_weight_proj = nn.Linear(in_channels*2, 2)
         self.to_seq = ToSequenceForm()
 
