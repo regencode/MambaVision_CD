@@ -194,12 +194,12 @@ def load_checkpoint(model, checkpoint_path, use_ema=False, strict=True):
 
 def create_model(
         model_name,
-        in_channels,
+        in_chans,
         pretrained=False,
         checkpoint_path='',
         **kwargs):
     create_fn = model_entrypoint(model_name)
-    model = create_fn(in_channels, pretrained=pretrained, **kwargs)
+    model = create_fn(in_chans=in_chans, pretrained=pretrained, **kwargs)
     if checkpoint_path:
         load_checkpoint(model, checkpoint_path)
 
