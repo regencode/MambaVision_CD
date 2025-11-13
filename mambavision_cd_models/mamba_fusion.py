@@ -259,10 +259,12 @@ class MambaVisionCDDecoder(nn.Module):
 
     def forward(self, x1s, x2s):
         x_fused_list = [None for _ in range(len(self.dims))]
-        x_fused_list[-1] = self.lowest_block(self.fusion[-1](x1s[-1], x2s[-1]))
-        for i in range(len(self.blocks)-2,0,-1):
-            x_fused_list[i] = self.blocks[i](self.fusion[i](x1s[i], x2s[i]), x_last=x_fused_list[i+1])
-
+        dim_ctr = len(self.dims)-1
+        x_fused_list[dim_ctr] = self.lowest_block(self.fusion[dim_ctr](x1s[dim_ctr], x2s[dim_ctr]))
+        dim_ctr -= 1
+        for i in range(len(self.blocks),-1,-1):
+            x_fused_list[dim_ctr] = self.blocks[i](self.fusion[dim_ctr](x1s[dim_ctr], x2s[dim_ctr]), x_last=x_fused_list[dim_ctr+1])
+            dim_ctr -= 1
         print(self.dims[0])
         print(x1s[0].shape)
         print(x2s[0].shape)
