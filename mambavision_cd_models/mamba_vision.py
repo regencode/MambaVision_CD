@@ -740,7 +740,8 @@ class MambaVision(nn.Module):
 
 @register_pip_model
 @register_model
-def mamba_vision_T(pretrained=False, **kwargs):
+#modified
+def mamba_vision_T(in_channels, pretrained=False, **kwargs):
     model_path = kwargs.pop("model_path", "/tmp/mamba_vision_T.pth.tar")
     dims = kwargs.pop("dims", [80, 160, 320, 640])
     depths = kwargs.pop("depths", [1, 3, 8, 4])
@@ -751,7 +752,7 @@ def mamba_vision_T(pretrained=False, **kwargs):
     drop_path_rate = kwargs.pop("drop_path_rate", 0.2)
     pretrained_cfg = resolve_pretrained_cfg('mamba_vision_T').to_dict()
     update_args(pretrained_cfg, kwargs, kwargs_filter=None)
-    model = MambaVision(3,
+    model = MambaVision(in_channels,
                         dims=dims,
                         depths=depths,
                         num_heads=num_heads,
