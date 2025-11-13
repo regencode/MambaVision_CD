@@ -45,6 +45,7 @@ class GlobalExtractor(nn.Module):
     def __init__(self, in_channels, out_channels, 
                  expand=2, 
                  d_conv=4, 
+                 d_state=16,
                  dt_rank="auto", 
                  dt_scale=1.0, 
                  dt_init="random", 
@@ -68,7 +69,7 @@ class GlobalExtractor(nn.Module):
         self.to_img = ToImageForm()
 
         A = repeat(
-            torch.arange(1, self.d_state + 1, dtype=torch.float32, device=device),
+            torch.arange(1, d_state + 1, dtype=torch.float32, device=device),
             "n -> d n",
             d=self.d_inner//2,
         ).contiguous()
@@ -103,7 +104,7 @@ class GlobalExtractor(nn.Module):
         f2 =  self.global_conv(rearrange(f2_proj, "b l d -> b d l"))
 
         x_dbl = self.x_proj(rearrange(f2, "b d l -> (b l) d"))
-        dt, B, C = torch.split(x_dbl, [self.dt_rank, self.d_state, self.d_state], dim=-1)
+        dt, B, C = torch.split(x_dbl, [self.dt_rank, d_state, d_state], dim=-1)
         dt = rearrange(self.dt_proj(dt), "(b l) d -> b d l", l=seqlen)
         A = -torch.exp(self.A_log.float())
         B = rearrange(B, "(b l) dstate -> b dstate l", l=seqlen).contiguous()
