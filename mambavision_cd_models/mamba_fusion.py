@@ -262,6 +262,11 @@ class MambaVisionCDDecoder(nn.Module):
         x_fused_list[-1] = self.lowest_block(self.fusion[-1](x1s[-1], x2s[-1]))
         for i in range(len(self.blocks)-2,0,-1):
             x_fused_list[i] = self.blocks[i](self.fusion[i](x1s[i], x2s[i]), x_last=x_fused_list[i+1])
+
+        print(self.dims[0])
+        print(x1s[0].shape)
+        print(x2s[0].shape)
+        print(x_fused_list[1].shape)
         return self.classifier(self.final_block(self.fusion[0](x1s[0], x2s[0]), x_last=x_fused_list[1]))
 
 class MambaVisionCD(nn.Module):
