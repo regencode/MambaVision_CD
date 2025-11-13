@@ -261,16 +261,16 @@ class MambaVisionCDDecoder(nn.Module):
     def forward(self, x1s, x2s):
         x11, x12, x13, x14 = x1s
         x21, x22, x23, x24 = x2s
-        x_4_fuse = self.lowest_block(self.fuse[3](x14, x24))
-        x_3_fuse = self.block1(self.fuse[2](x13, x23), x_last=x_4_fuse)
-        x_2_fuse = self.block2(self.fuse[1](x12, x22), x_last=x_3_fuse)
-        x_1_fuse = self.final_block(self.fuse[0](x11, x21), x_last=x_2_fuse)
+        x_4_fuse = self.lowest_block(self.fusion[3](x14, x24))
+        x_3_fuse = self.block1(self.fusion[2](x13, x23), x_last=x_4_fuse)
+        x_2_fuse = self.block2(self.fusion[1](x12, x22), x_last=x_3_fuse)
+        x_1_fuse = self.final_block(self.fusion[0](x11, x21), x_last=x_2_fuse)
         return self.classifier(x_1_fuse)
 
 class MambaVisionCD(nn.Module):
     def __init__(self,
                  in_chans,
-                 dims,
+                 dim,
                  depths,
                  window_size,
                  mlp_ratio,
