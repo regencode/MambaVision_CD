@@ -55,7 +55,7 @@ class GlobalExtractor(nn.Module):
 
         super().__init__()
         self.d_inner = int(in_channels*expand)
-        self.dt_rank = math.ceil(self.d_model / 16) if dt_rank == "auto" else dt_rank
+        self.dt_rank = math.ceil(in_channels/ 16) if dt_rank == "auto" else dt_rank
         self.mamba_mixer_path = MambaVisionMixer(in_channels, expand=expand, use_linear=False, d_conv=d_conv)
         self.global_proj = nn.Linear(in_channels, self.d_inner)
         self.global_conv = nn.Sequential(
