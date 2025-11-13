@@ -689,6 +689,9 @@ class MambaVision(nn.Module):
                                      )
             self.levels.append(level)
         self.apply(self._init_weights)
+        num_features = int(dims[-1])
+        self.norm = nn.BatchNorm2d(num_features)
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
 
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
