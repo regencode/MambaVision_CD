@@ -691,7 +691,6 @@ class MambaVision(nn.Module):
         self.apply(self._init_weights)
         num_features = int(dims[-1])
         self.norm = nn.BatchNorm2d(num_features)
-        self.avgpool = nn.AdaptiveAvgPool2d(1)
 
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
@@ -715,15 +714,10 @@ class MambaVision(nn.Module):
     def forward_features(self, x):
         x = self.patch_embed(x)
         x_levels = []
-        for i, level in enumerate(self.levels):
-            if i > 0: x_levels.append(x)
+        for level in self.levels:
             x = level(x)
-        x = self.norm(x)
-        x = self.avgpool(x)
-        x = torch.flatten(x, 1)
-        x_levels.append(x)
-
-        return x_levels[:]
+            x_levels.append(x)
+        return x_levels
 
     def forward(self, x):
         xs = self.forward_features(x)
