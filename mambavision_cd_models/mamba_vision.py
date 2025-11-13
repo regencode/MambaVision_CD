@@ -723,7 +723,7 @@ class MambaVision(nn.Module):
         x = torch.flatten(x, 1)
         x_levels.append(x)
 
-        return x_levels[:-1:]
+        return x_levels
 
     def forward(self, x):
         xs = self.forward_features(x)
