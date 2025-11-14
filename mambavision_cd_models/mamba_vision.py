@@ -809,10 +809,12 @@ def mamba_vision_T2(pretrained=False, **kwargs):
 @register_model
 def mamba_vision_S(pretrained=False, **kwargs):
     model_path = kwargs.pop("model_path", "/tmp/mamba_vision_S.pth.tar")
-    depths = kwargs.pop("depths", [3, 3, 7, 5])
+    #original depths = kwargs.pop("depths", [3, 3, 7, 5])
+    depths = kwargs.pop("depths", [2, 2, 4, 2])
     num_heads = kwargs.pop("num_heads", [2, 4, 8, 16])
     window_size = kwargs.pop("window_size", [8, 8, 14, 7])
-    dims = kwargs.pop("dims", [96, 96*2, 96*4, 96*8])
+    #dims = kwargs.pop("dims", [96, 96*2, 96*4, 96*8])
+    dims = kwargs.pop("dims", [64, 128, 256, 512])
     mlp_ratio = kwargs.pop("mlp_ratio", 4)
     resolution = kwargs.pop("resolution", 224)
     drop_path_rate = kwargs.pop("drop_path_rate", 0.2)
