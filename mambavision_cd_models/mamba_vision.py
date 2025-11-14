@@ -32,14 +32,14 @@ from pathlib import Path
 
 def _cfg(url='', **kwargs):
     return {'url': url,
-            'num_classes': 1000,
-            'input_size': (3, 224, 224),
+            'num_classes': 2,
+            'input_size': (3, 256, 256),
             'pool_size': None,
             'crop_pct': 0.875,
             'interpolation': 'bicubic',
             'fixed_input_size': True,
-            'mean': (0.485, 0.456, 0.406),
-            'std': (0.229, 0.224, 0.225),
+            #'mean': (0.485, 0.456, 0.406),
+            #'std': (0.229, 0.224, 0.225),
             **kwargs
             }
 
@@ -750,7 +750,7 @@ def mamba_vision_T(in_chans=3, pretrained=False, **kwargs):
     num_heads = kwargs.pop("num_heads", [2, 4, 8, 16])
     window_size = kwargs.pop("window_size", [8, 8, 14, 7])
     mlp_ratio = kwargs.pop("mlp_ratio", 4)
-    resolution = kwargs.pop("resolution", 224)
+    resolution = kwargs.pop("resolution", 256)
     drop_path_rate = kwargs.pop("drop_path_rate", 0.2)
     pretrained_cfg = resolve_pretrained_cfg('mamba_vision_T').to_dict()
     update_args(pretrained_cfg, kwargs, kwargs_filter=None)
