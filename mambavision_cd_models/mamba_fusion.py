@@ -313,6 +313,7 @@ class MambaVisionCD(nn.Module):
                  in_chans,
                  encoder_model=None,
                  dims=[64, 128, 256, 512],
+                 reduced_dims=None,
                  depths=[2, 2, 4, 2],
                  window_size=[4, 4, 6, 8],
                  mlp_ratio=4,
@@ -348,7 +349,7 @@ class MambaVisionCD(nn.Module):
             )
         self.dec = MambaVisionCDDecoder(num_classes,
                                         dims=self.enc.dims,
-                                        reduced_dims=[32, 64, 128, 256])
+                                        reduced_dims=None)
 
     def forward(self, x1, x2):
         x1s = self.enc(x1)
