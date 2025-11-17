@@ -671,7 +671,7 @@ class MambaVision(nn.Module):
         """
         super().__init__()
         assert len(dims) == len(depths), f"dims[] len does not match depths[] len"
-        self.patch_embed = PatchEmbed(in_chans=in_chans, out_chans=dims[0], in_dim=256)
+        self.patch_embed = PatchEmbed(in_chans=in_chans, out_chans=dims[0], in_dim=64)
         dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))]
         self.levels = nn.ModuleList()
         self.downsamples = nn.ModuleList()
