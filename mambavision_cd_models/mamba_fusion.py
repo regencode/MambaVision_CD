@@ -149,7 +149,6 @@ class LocalExtractor(nn.Module):
             nn.SiLU(),
             nn.Conv2d(self.d_inner, self.d_inner, kernel_size=3, padding=1),
             ToSequenceForm(),
-            nn.LayerNorm(self.d_inner),
             nn.SiLU()
         ) 
         self.out_proj = nn.Linear(self.d_inner, out_channels)
