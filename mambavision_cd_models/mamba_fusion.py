@@ -269,7 +269,7 @@ class MambaVisionCDDecoder(nn.Module):
                  dims,
                  reduced_dims=None):
 
-        reduced_dims = [None for _ in range(len(dims))] if reduced_dims is None else reduced_dims
+        reduced_dims = dims if reduced_dims is None else reduced_dims
         super().__init__()
         self.dims = dims
         self.fusion = nn.ModuleList([
@@ -277,11 +277,11 @@ class MambaVisionCDDecoder(nn.Module):
         ])
 
         # for now, assume len(dims) = 4
-        self.lowest_block = MambaVisionCDDecoderBlock(dims[3], dims[2], upsample=True, fuse_features=False)
-        self.block1 = MambaVisionCDDecoderBlock(dims[2], dims[1], upsample=True, fuse_features=True)
-        self.block2 = MambaVisionCDDecoderBlock(dims[1], dims[0], upsample=True, fuse_features=True)
-        self.final_block = MambaVisionCDDecoderBlock(dims[0], dims[0], upsample=False, fuse_features=True)
-        self.classifier = ConvUpsampleAndClassify(dims[0], num_classes)
+        self.lowest_block = MambaVisionCDDecoderBlock(reduced_dims[3], reduced_dims[2], upsample=True, fuse_features=False)
+        self.block1 = MambaVisionCDDecoderBlock(reduced_dims[2], reduced_dims[1], upsample=True, fuse_features=True)
+        self.block2 = MambaVisionCDDecoderBlock(reduced_dims[1], reduced_dims[0], upsample=True, fuse_features=True)
+        self.final_block = MambaVisionCDDecoderBlock(reduced_dims[0], reduced_dims[0], upsample=False, fuse_features=True)
+        self.classifier = ConvUpsampleAndClassify(reduced_dims[0], num_classes)
 
         self.apply(self._init_weights)
 
